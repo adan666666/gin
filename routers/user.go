@@ -7,6 +7,7 @@ import (
 
 func InitUser(group *gin.RouterGroup) {
 	v1 := group.Group("/v1")
+	//v1.Use() //在哪里use作用域就在哪个地方
 	v1.GET("/user/:id/:name", controllers.GetUser)
 	v1.POST("/user", controllers.AddUser)
 	v1.PUT("/user", controllers.UpdateUser)
