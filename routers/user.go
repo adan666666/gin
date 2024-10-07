@@ -2,8 +2,13 @@ package routers
 
 import (
 	"gin/controllers"
+	"gin/stuope"
 	"github.com/gin-gonic/gin"
 )
+
+/**
+总路由
+*/
 
 func InitUser(group *gin.RouterGroup) {
 	v1 := group.Group("/v1")
@@ -22,9 +27,15 @@ func InitUser(group *gin.RouterGroup) {
 	v2.POST("/user")
 	v2.PUT("/user")
 	v2.DELETE("/user")
+
+	//分路由
+	s := group.Group("/stuope") //添加Student操作分组
+	//模块分组
+	stuope.Router(s)
+
 }
 
 // 在main函数之前，导入包的时间 就会调用这个方法
-func init() {
-
-}
+//func init() {
+//
+//}
