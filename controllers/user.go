@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -21,11 +23,14 @@ func GetUser(c *gin.Context) {
 }
 func AddUser(c *gin.Context) {
 	req := &user{}
+	//form表单和json都可以绑定
 	err := c.ShouldBind(req) //Bind发生错误会直接返回给客户，程序不往下走
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	j, _ := json.Marshal(req) //结构体转json
+	fmt.Println(string(j))
 	c.JSON(http.StatusOK, req)
 	/*name := c.PostForm("name")
 	age := c.PostForm("age")
@@ -48,8 +53,11 @@ func DeleteUser(c *gin.Context) {
 }
 
 // 在go语言里首字母大写是公有的，小写是私有的
+// form(表单标签)、binding(表单验证标签)
+// form:"name"  相当于定一个别名前端传过来的字段
 type user struct {
-	Name  string `form:"name" binding:"required,alphaunicode"` //github.com/go-playground/validator/v10  这个库的验证
+	//可同时加增加json和form标签
+	Name  string `json:"name" form:"name" binding:"required,alphaunicode"` //github.com/go-playground/validator/v10  这个库的验证
 	Age   int    `form:"age" binding:"number"`
 	Addr  string `form:"addr" binding:"alphaunicode"`
 	Email string `form:"email" binding:"omitempty,email"` //如果为不为空再校验

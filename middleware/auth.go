@@ -29,6 +29,7 @@ func Auth1(data interface{}) gin.HandlerFunc {
 			})
 			context.Abort() //终止请求
 		}
-		context.Next() //路由继续往下走
+		context.Set("access_token", accessToken) //可以在中间价中存值，跨中间介取值
+		context.Next()                           //会执行下一个中间介，
 	}
 }
