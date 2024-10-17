@@ -22,7 +22,7 @@ type Student struct {
 }
 
 func main() {
-	db, err := gorm.Open("mysql", "root:@tcp(localhost:3306)/cg_dev?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", "root:mima123@tcp(localhost:3306)/cg_dev?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		panic(err)
 	}
