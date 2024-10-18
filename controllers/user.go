@@ -12,7 +12,7 @@ import (
 // 2. 使用Gin的Context.Get()方法从struct中获取特定参数；
 // 3. 使用Gin的Context.Query()方法从URL中获取特定参数；
 // 4. 使用Gin的Context.PostForm()方法从表单中获取特定参数；
-// 5. 使用Gin的Context.Params.ByName()方法从路由参数中获取特定参数。
+// 5. 使用Gin的Context.Params()方法从路由参数中获取特定参数,和Query一样
 func GetUser(c *gin.Context) {
 	id := c.DefaultQuery(`id`, "0")
 	name := c.DefaultQuery(`name`, "0")

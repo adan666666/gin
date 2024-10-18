@@ -87,3 +87,60 @@ func StudentList(context *gin.Context) {
 	//关闭资源
 	//dbope.DB.Close()
 }
+
+// put 改
+func Update(context *gin.Context) {
+	var student models.Student
+	stu_id := context.Param("stu_id") //http://localhost:8080/api/stuope/studentUpdate/1
+	fmt.Println("测试=", stu_id)
+	//断断id是否存在
+	//dbope.DB.Where("id=?", ctx.Param("id")).Find(&data)
+	//或者    不要Select默认选择所有
+	dbope.DB. /*.Select("stu_id,name,age")*/ Where("stu_id = ?", stu_id).Find(&student) //// 获取所有匹配记录
+	fmt.Println(student)
+	//判断ID是否存在
+	if student.StuId == 0 {
+		context.JSON(http.StatusOK, gin.H{
+			"code": 400,
+			"msg":  "没有查询到数据",
+		})
+		return
+	}
+	var s_id = student.StuId
+
+	//绑定  //传过来的是json  //会重写上面student的值
+	if err := context.ShouldBindJSON(&student); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "message": "错误请求参数"})
+		return
+	}
+	//优化
+	if student.StuId != s_id {
+		student.StuId = s_id
+	}
+	fmt.Println(student) //会重写上面student的值
+
+	//修改 绑定的student里面有id所以会根据id来更新
+	//updates := dbope.DB.Model(&student). /*Where("stu_id = ?", stu_id).*/ Updates(&student)
+	//这种student1里面没有id   客户端也不要传id过来  因为第一个student通过 .Param("stu_id")浏览器传过来查出来的，第二个是传过的，stu_id假如不一致会出问题
+	//UPDATE `students` SET `age` = 18, `email` = 'xxxxx@gamil.com', `name` = '张三', `sex` = '女', `stu_id` = 7  WHERE `students`.`stu_id` = 7 and `students`.`stu_id` = 1
+	//{
+	//    "Name": "张三经",
+	//    "Age": 18,
+	//    "Email": "xxxxx@gamil.com",
+	//    "Sex": "女",
+	//    "Desc": ""
+	//}
+	updates := dbope.DB.Model(&student).Where("stu_id = ?", stu_id).Updates(&student)
+	if updates.RowsAffected > 0 {
+		context.JSON(http.StatusOK, gin.H{
+			"code": 200,
+			"msg":  "更新成功",
+			"data": updates,
+		})
+	} else {
+		context.JSON(http.StatusOK, gin.H{
+			"code": 400,
+			"msg":  "更新失败",
+		})
+	}
+}
