@@ -18,6 +18,7 @@ func main() {
 	api.Use(middleware.Auth1("like 12345"))
 	fmt.Println("hhhhhhh")
 	routers.InitUser(api)
+	//端口
 	r.Run("localhost:8080") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080"
 
 }

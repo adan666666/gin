@@ -10,15 +10,45 @@ import (
 	"strconv"
 )
 
-func Hello1(context *gin.Context) {
+func AddStudent(context *gin.Context) {
+	var student models.Student
 	//操作数据库
 	//添加一条记录
-	var student = models.Student{
-		Name: "丽丽",
-		Age:  18,
+	/*var student = models.Student{
+		StuId: 1,
+		Name:  "丽丽",
+		Age:   18,
+	}*/
+	err := context.ShouldBind(&student)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"msg":  err,
+			"code": 500,
+		})
+		return
+	}
+	//"" 来判断字符串是否为空
+	if student.Name == "" || len(student.Name) == 0 {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"msg":  "请输入用户名",
+			"code": 500,
+		})
+		return
 	}
 	//添加操作
-	dbope.DB.Create(&student)
+	create := dbope.DB.Create(&student)
+	if create.Error != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"msg":  create.Error.Error(),
+			"code": 500,
+		})
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{
+		"msg":  "添加成功",
+		"code": 200,
+		"data": student,
+	})
 	//关闭资源
 	//dbope.DB.Close()
 }
@@ -141,6 +171,34 @@ func Update(context *gin.Context) {
 		context.JSON(http.StatusOK, gin.H{
 			"code": 400,
 			"msg":  "更新失败",
+		})
+	}
+}
+
+// 删除
+func Delete(context *gin.Context) {
+	var student models.Student
+	stu_id := context.DefaultQuery("id", "none")
+	if stu_id == "none" {
+		context.JSON(http.StatusOK, gin.H{"code": 400,
+			"msg": "请输入用户id"})
+	}
+	dbope.DB.Debug().Select("stu_id").Where("stu_id = ?", stu_id).Find(&student) //// 获取所有匹配记录
+	fmt.Println(student.StuId)                                                   //如果传的找不到都是0
+	if student.StuId == 0 {
+		context.JSON(http.StatusOK, gin.H{"code": 400,
+			"msg": "请输入用户正确Id"})
+		return
+	}
+	//不加where还是会根据 id删除
+	//DELETE FROM `students`  WHERE `students`.`stu_id` = 13  #不加wher
+	//DELETE FROM `students`  WHERE `students`.`stu_id` = 12 AND ((stu_id = '12'))  #加wher
+	dbope.DB. /*.Where("stu_id = ?", stu_id)*/ Delete(&student)
+	fmt.Println(student)
+	if student.StuId != 0 {
+		context.JSON(http.StatusOK, gin.H{"code": 200,
+			"msg":  "删除成功",
+			"data": student,
 		})
 	}
 }
