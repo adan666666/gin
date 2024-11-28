@@ -37,9 +37,9 @@ func main() {
 	//开启打印日志
 	db.LogMode(true)
 	//User-users
-	if !db.HasTable(&User{}) {
-		db.CreateTable(&User{})
-	}
+	//if !db.HasTable(&User{}) {
+	//	db.CreateTable(&User{})
+	//}
 
 	//db.CreateTable(&Student{})
 	//这种方式可以指定表名
@@ -74,4 +74,23 @@ func main() {
 	//db.Raw("select * from users age=?", 10).Find(&users)
 	//fmt.Println(users)
 
+	db.CreateTable(&Author{})
+	db.CreateTable(&Article{})
+}
+
+type Author struct {
+	AID  int `gorm:"primary_key;AUTO_INCREMENT"`
+	Name string
+	Age  int
+	Sex  string
+	//关联关系：
+	As []Article `gorm:"ForeignKey:AuId;AssociationForeignKey:AID"`
+}
+type Article struct {
+	ArId    int `gorm:"primary_key;AUTO_INCREMENT"`
+	Title   string
+	Content string
+	Desc    string
+	//设置外键：
+	AuId int
 }
